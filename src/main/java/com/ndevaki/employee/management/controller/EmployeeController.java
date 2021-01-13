@@ -2,6 +2,8 @@ package com.ndevaki.employee.management.controller;
 
 import java.net.URI;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -28,29 +30,32 @@ public class EmployeeController {
 	@Autowired
 	EmployeeService employeeService;
 	
+	static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+	 
 	@RequestMapping(method=RequestMethod.POST)
-	public ResponseEntity create(Employee employee) {
+	public ResponseEntity create(final Employee employee) {
 		employeeService.save(employee);
+		logger.info("Created employee resource "+employee);
 		URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(employee.getId()).toUri();
 		return ResponseEntity.created(location).build();
 	}
 	
 	@RequestMapping(value="/{id}",method=RequestMethod.GET)
-	public Employee get(@PathVariable("id") Long id) {
+	public Employee get(@PathVariable("id")final Long id) {
 		
 		return Employee.findById(id);
 	}
 	
 	@RequestMapping(value="/",method=RequestMethod.GET)
-	public Employee get(@RequestParam(value = "offset", defaultValue =OFFSET) int offset,
-						@RequestParam(value = "limit", defaultValue =LIMIT) int limit) {
+	public Employee get(@RequestParam(value = "offset", defaultValue =OFFSET) final int offset,
+						@RequestParam(value = "limit", defaultValue =LIMIT) final int limit) {
 		
 		return Employee.findById(id);
 	}
 	
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
-	public void delete(@PathVariable("id") Long id) {
+	public void delete(@PathVariable("id") final Long id) {
 		boolean status=employeeService.deActivate(id);
 		
 	}
