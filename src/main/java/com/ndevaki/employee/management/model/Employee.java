@@ -1,12 +1,15 @@
 package com.ndevaki.employee.management.model;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
 public class Employee {
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	Long id;
 	String firstName;
 	String lastName;
@@ -14,6 +17,7 @@ public class Employee {
 	int age;
 	String address;
 	Status status;
+	Gender gender;
 	
 	public enum Status{
 		ACTIVE,
@@ -32,8 +36,6 @@ public class Employee {
 			this.label=label;
 		}
 	}
-	
-	
 	public Long getId() {
 		return id;
 	}
@@ -72,6 +74,12 @@ public class Employee {
 	}
 	public void setStatus(Status status) {
 		this.status = status;
+	}
+	public Gender getGender() {
+		return gender;
+	}
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 	@Override
 	public String toString() {
