@@ -1,65 +1,84 @@
 package com.ndevaki.employee.management.service;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.internal.bytebuddy.build.Plugin.Engine.Source;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.ndevaki.employee.management.controller.EmployeeController;
 import com.ndevaki.employee.management.dao.EmployeeRepository;
 import com.ndevaki.employee.management.exception.EmployeeNotFoundException;
 import com.ndevaki.employee.management.model.Employee;
 import com.ndevaki.employee.management.model.Employee.Status;
+import com.ndevaki.employee.management.model.dto.EmployeeDTO;
+import com.ndevaki.employee.management.model.dto.EmployeeListDTO;
 
 @Service
 public class EmployeeService {
 
 	@Autowired
-	EmployeeRepository employeeRepository;
+	private EmployeeRepository employeeRepository;
+	@Autowired
+	private ModelMapper modelMapper;
 	
-	static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+	static final Logger logger = LoggerFactory.getLogger(EmployeeService.class);
 	
-	//This method does employee soft delete
-	public Employee deActivate(Long id) {
+	/*
+	 * This method perform employee soft delete
+	 */
+	public void deActivate(Long id) {
 		Employee employee=findEmployeeById(id);
 		employee.setStatus(Status.INACTIVE);
-		logger.info("Employe id="+id+" is going to be deactivated");
-		return employeeRepository.save(employee);
+		logger.info("Employe is going to be deactivated",employee);
+		employeeRepository.save(employee);
 	}
 	
-	//This method creates new employee record
-	public Employee save(Employee employee) {
+	/*
+	 * This method creates new employee record
+	 */
+	public EmployeeDTO save(EmployeeDTO employeeDTO) {
+		Employee employee=convertEmployeeToEmployeeDTO(employeeDTO);
 		employee.setStatus(Employee.Status.ACTIVE);
 		Employee savedEmployee=employeeRepository.save(employee);
-		logger.info("Employee "+savedEmployee+" is saved");
-		return savedEmployee;
+		logger.info("Employee is saved"+employee.getId());
+		return convertEmployeeToEmployeeDTO(savedEmployee);
 	}
 	
-	//This method returns list of employees based on offset and limit
-	public Map<String,Object> searchAll(int offSet,int limit){
-		Map<String,Object> responseMap=new HashMap<String,Object>();
+	/*
+	 * This method returns list of employees based on offset and limit
+	 */
+	public EmployeeListDTO searchAll(int offSet,int limit){
 		List<Employee> employees =employeeRepository.findAllByStatus(Employee.Status.ACTIVE,PageRequest.of(offSet,limit));
-		Long totalEmployees=employeeRepository.countByStatus(Employee.Status.ACTIVE);
-		responseMap.put("employees",employees);
-		responseMap.put("offset",offSet);
-		responseMap.put("limit",limit);
-		responseMap.put("total",totalEmployees);
-		return responseMap;
+		ArrayList<EmployeeDTO> employeeDTOs=new ArrayList<EmployeeDTO>();
+		employeeDTOs=employees.stream()
+				.map(employee -> convertEmployeeToEmployeeDTO(employee))
+				.collect(Collectors.toCollection(ArrayList::new));
+		Long totalEmployeesCount=employeeRepository.countByStatus(Employee.Status.ACTIVE);
+		EmployeeListDTO employeeDTOList=new EmployeeListDTO();
+		return employeeDTOList.addEmployeeDTOList(employeeDTOs)
+						.addLimit(limit)
+						.addOffset(offSet)
+						.addTotalCount(totalEmployeesCount).build();
 	}
 	
-	//This method searches employee by id and returns employee object
-	public Employee search(Long id) {
-		return findEmployeeById(id);
+	/*
+	 *This method searches employee by id and returns employeeDTO object 
+	 */
+	public EmployeeDTO search(Long id) {
+		return convertEmployeeToEmployeeDTO(findEmployeeById(id));
 	}
 	
-	//This method updates the employee details
-	public void update(Employee updateEmployee,Long id) {
+	/*
+	 * This method updates the employee details
+	 */
+	public void update(EmployeeDTO updateEmployee,Long id) {
 		Employee actualEmployee=findEmployeeById(id);
 		if(updateEmployee.getFirstName()!=null) {
 			actualEmployee.setFirstName(updateEmployee.getFirstName());
@@ -80,13 +99,38 @@ public class EmployeeService {
 			actualEmployee.setAge(updateEmployee.getAge());
 		}
 		employeeRepository.save(actualEmployee);
+		logger.info("Updated employee details",actualEmployee);
 	}
 	
+	/*
+	 * Queries employee object by employee id
+	 */
 	private Employee findEmployeeById(Long id) {
 		Employee employee=employeeRepository.findByIdAndStatus(id,Employee.Status.ACTIVE);
 		if(employee==null) {
+			logger.info("Active employee with id is not found",id);
 			throw new EmployeeNotFoundException("Id-"+id);
 		}
 		return employee;
+	}
+	
+	/*
+	 * Converts Employee object to EmployeeDTO object
+	 * This is used to provide abstraction to employee model object
+	 */
+	final private EmployeeDTO convertEmployeeToEmployeeDTO(Employee employee) {
+		 EmployeeDTO employeeDTO = modelMapper.map(employee, EmployeeDTO.class);	
+		 employeeDTO.setId(employee.getId());
+		 logger.info("returning "+employeeDTO);
+		 return employeeDTO;
+	}
+	
+	/*
+	 * Converts EmployeeDTO object to Employee.
+	 * This is used to provide abstraction to employee model object
+	 */
+	final private Employee convertEmployeeToEmployeeDTO(EmployeeDTO employeeDTO) {
+		 Employee employee = modelMapper.map(employeeDTO, Employee.class);	
+		 return employee;
 	}
 }

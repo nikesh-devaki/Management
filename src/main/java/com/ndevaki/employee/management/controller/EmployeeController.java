@@ -1,7 +1,6 @@
 package com.ndevaki.employee.management.controller;
 
 import java.net.URI;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ndevaki.employee.management.model.Employee;
+import com.ndevaki.employee.management.model.dto.EmployeeDTO;
+import com.ndevaki.employee.management.model.dto.EmployeeListDTO;
 import com.ndevaki.employee.management.service.EmployeeService;
 
 @RestController
@@ -35,33 +35,55 @@ public class EmployeeController {
 	
 	static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 	 
+	/*
+	 * This api to create new employee record
+	 */
 	@PostMapping
-	public ResponseEntity create(@RequestBody Employee employee) {
-		employeeService.save(employee);
-		logger.info("Created employee resource "+employee);
-		URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(employee.getId()).toUri();
+	public ResponseEntity create(@RequestBody EmployeeDTO employeeDTO) {
+		EmployeeDTO savedEmployee=employeeService.save(employeeDTO);
+		logger.info("Created employee resource "+savedEmployee.getId());
+		URI location=ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(savedEmployee.getId()).toUri();
 		return ResponseEntity.created(location).build();
 	}
 	
+	/*
+	 * This api to search employee record by employee id
+	 * @param - Employee id
+	 */
 	@GetMapping("{id}")
-	public Employee search(@PathVariable("id")final Long id) {
+	public EmployeeDTO search(@PathVariable("id")final Long id) {
 		return employeeService.search(id);
 	}
 	
+	/*
+	 * This api to get list of active employees by offset and limit
+	 * @param offset default - 0
+	 * @param limit default - 15
+	 */
 	@GetMapping
-	public Map<String, Object> searchAll(@RequestParam(value = "offset", defaultValue =OFFSET) final int offSet,
+	public EmployeeListDTO searchAll(@RequestParam(value = "offset", defaultValue =OFFSET) final int offSet,
 						@RequestParam(value = "limit", defaultValue =LIMIT) final int limit) {
 		return employeeService.searchAll(offSet, limit);
 	}
 	
+	/*
+	 * This api to delete employee with input id
+	 * @param employee id
+	 */
 	@DeleteMapping("{id}")
-	public void delete(@PathVariable("id") final Long id) {
+	public ResponseEntity delete(@PathVariable("id") final Long id) {
 		employeeService.deActivate(id);
+		return ResponseEntity.ok().build();
 	}
 	
+	/*
+	 * This api to update details of active employee
+	 * @param id
+	 * @param EmployeeDTO 
+	 */
 	@PatchMapping("{id}")
-	public ResponseEntity update(@PathVariable("id") Long id, @RequestBody Employee employee) {
-		employeeService.update(employee,id);
-		return ResponseEntity.noContent().build();
+	public ResponseEntity update(@PathVariable("id") Long id, @RequestBody EmployeeDTO employeeDTO) {
+		employeeService.update(employeeDTO,id);
+		return ResponseEntity.ok().build();
 	}
 }

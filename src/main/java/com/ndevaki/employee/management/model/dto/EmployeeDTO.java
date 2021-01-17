@@ -1,51 +1,42 @@
-package com.ndevaki.employee.management.model;
+package com.ndevaki.employee.management.model.dto;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
-@Entity
-public class Employee {
+import com.ndevaki.employee.management.model.Employee.Gender;
+import com.ndevaki.employee.management.model.Employee.Status;
 
-	@Id
+/*
+ * DTO object for employee model object
+ */
+public class EmployeeDTO {
+
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long id;
-    @Column(nullable = false)
-	private String firstName;
-    @Column(nullable = false)
-	private String lastName;
-    @Column(nullable = false)
-	private String emailId;
-    @Column(nullable = false)
-	private int age;
-    @Column(nullable = false)
-	private String address;
-    @Column(nullable = false)
-	private Status status;
-    @Column(nullable = false)
-	private Gender gender;
+	Long id;
+	String firstName;
+	String lastName;
+	String emailId;
+	int age;
+	String address;
+	Status status;
+	Gender gender;
 	
-	public enum Status{
-		ACTIVE,
-		INACTIVE
+	
+	public EmployeeDTO(Long id, String firstName, String lastName, String emailId, int age, String address,
+			Status status, Gender gender) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.emailId = emailId;
+		this.age = age;
+		this.address = address;
+		this.status = status;
+		this.gender = gender;
 	}
-	private Employee() {
-		
-	}
-	public enum Gender{
-		MALE("Male"),
-		FEMALE("Female");
-		
-		String label;
-		
-		Gender(String label) {
-			this.label=label;
-		}
-	}
-	void setId(Long id) {
-		this.id=id;
+	
+	public void setId(Long id) {
+		this.id = id;
 	}
 	public Long getId() {
 		return id;
@@ -94,6 +85,8 @@ public class Employee {
 	}
 	@Override
 	public String toString() {
-		return "Employee [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + "]";
-	}	
+		return "EmployeeDTO [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", emailId=" + emailId
+				+ ", age=" + age + ", address=" + address + ", status=" + status + ", gender=" + gender + "]";
+	}
+	
 }
