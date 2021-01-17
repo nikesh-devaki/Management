@@ -1,4 +1,4 @@
-# RESTful services for employee management using Spring Boot
+# RESTful services for employee management
  
 ## Technologies to be considered are:
 
