@@ -1,13 +1,18 @@
 package com.ndevaki.employee.management.controller;
 
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +35,11 @@ public class EmployeeController {
 	
 	private static final String LIMIT="15";
 	
+	@InitBinder
+	public void addBinder(WebDataBinder binder) {
+		SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-mm-dd");
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat,false));
+	}
 	@Autowired
 	EmployeeService employeeService;
 	

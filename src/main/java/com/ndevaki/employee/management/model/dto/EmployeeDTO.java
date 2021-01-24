@@ -1,8 +1,14 @@
 package com.ndevaki.employee.management.model.dto;
 
+import java.util.Date;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 
+import org.hibernate.type.LocalDateType;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ndevaki.employee.management.model.Employee.Gender;
 import com.ndevaki.employee.management.model.Employee.Status;
 
@@ -11,7 +17,7 @@ import com.ndevaki.employee.management.model.Employee.Status;
  */
 public class EmployeeDTO {
 
-	@GeneratedValue(strategy=GenerationType.AUTO)
+	
 	Long id;
 	String firstName;
 	String lastName;
@@ -20,10 +26,15 @@ public class EmployeeDTO {
 	String address;
 	Status status;
 	Gender gender;
+	@JsonFormat(pattern="yyyy-MM-dd")
+	@DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
+	LocalDateType joiningDate;
 	
-	
+	private EmployeeDTO() {
+		
+	}
 	public EmployeeDTO(Long id, String firstName, String lastName, String emailId, int age, String address,
-			Status status, Gender gender) {
+			Status status, Gender gender,LocalDateType joiningDate) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -33,6 +44,7 @@ public class EmployeeDTO {
 		this.address = address;
 		this.status = status;
 		this.gender = gender;
+		this.joiningDate=joiningDate;
 	}
 	
 	public void setId(Long id) {
@@ -83,6 +95,14 @@ public class EmployeeDTO {
 	public void setGender(Gender gender) {
 		this.gender = gender;
 	}
+	public LocalDateType getJoiningDate() {
+		return joiningDate;
+	}
+
+	public void setJoiningDate(LocalDateType joiningDate) {
+		this.joiningDate = joiningDate;
+	}
+
 	@Override
 	public String toString() {
 		return "EmployeeDTO [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", emailId=" + emailId

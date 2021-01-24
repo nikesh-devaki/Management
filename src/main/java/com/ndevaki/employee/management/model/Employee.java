@@ -1,10 +1,15 @@
 package com.ndevaki.employee.management.model;
 
+import java.sql.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import org.hibernate.type.LocalDateType;
+
 
 @Entity
 public class Employee {
@@ -26,6 +31,8 @@ public class Employee {
 	private Status status;
     @Column(nullable = false)
 	private Gender gender;
+	@Column(nullable=false)
+	 private LocalDateType  joiningDate;
 	
 	public enum Status{
 		ACTIVE,
@@ -42,6 +49,14 @@ public class Employee {
 		
 		Gender(String label) {
 			this.label=label;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public void setLabel(String label) {
+			this.label = label;
 		}
 	}
 	void setId(Long id) {
@@ -91,6 +106,13 @@ public class Employee {
 	}
 	public void setGender(Gender gender) {
 		this.gender = gender;
+	}
+	
+	public LocalDateType getJoiningDate() {
+		return joiningDate;
+	}
+	public void setJoiningDate(LocalDateType joiningDate) {
+		this.joiningDate = joiningDate;
 	}
 	@Override
 	public String toString() {
