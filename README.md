@@ -1,13 +1,4 @@
-# RESTful services for employee management using Spring Boot
-
-## REST Service with Spring Boot and include logging.
-  Create a new Empolyee.
-  
- Update a existing Empolyee(all attributes).
- 
-Get all empolyees (and) get one employee.
-
- Delete an employee.(prefered soft delete)
+# RESTful services for employee management
  
 ## Technologies to be considered are:
 
